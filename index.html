@@ -11,28 +11,6 @@
       font-family: 'Segoe UI', sans-serif;
       transition: background 0.5s, color 0.5s;
     }
-    .menu-card {
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
-      cursor: pointer;
-    }
-    .menu-card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-    }
-    iframe {
-      border: none;
-      width: 100%;
-      height: 85vh;
-      background: #fff;
-    }
-    .fade-enter {
-      animation: fadeIn 0.8s;
-    }
-    @keyframes fadeIn {
-      from {opacity: 0;}
-      to {opacity: 1;}
-    }
-    /* Tema */
     .light-mode {
       background: linear-gradient(135deg, #f8fafc, #e2e8f0);
       color: #1e293b;
@@ -41,7 +19,27 @@
       background: radial-gradient(circle at top left, #0f172a, #1e293b);
       color: #f1f5f9;
     }
-    /* Sabit üst menü */
+    .menu-tile {
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fff;
+    }
+    .menu-tile:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+    iframe {
+      border: 10px solid #333;
+      border-radius: 20px;
+      width: 100%;
+      height: 80vh;
+      background: #fff;
+    }
     #topBar {
       position: fixed;
       top: 0;
@@ -49,59 +47,68 @@
       right: 0;
       z-index: 50;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       padding: 0.5rem 1rem;
       background: rgba(0,0,0,0.6);
       backdrop-filter: blur(6px);
     }
     #topBar button {
+      margin: 0 10px;
       transition: transform 0.3s;
+      font-size: 1.5rem;
     }
     #topBar button:hover {
-      transform: rotate(10deg) scale(1.1);
+      transform: rotate(10deg) scale(1.2);
     }
   </style>
 </head>
-<body class="dark-mode p-4">
+<body class="dark-mode">
   <!-- Üst Bar -->
   <div id="topBar">
-    <button onclick="goHome()" class="text-2xl">🏠</button>
-    <button onclick="toggleMode()" class="text-xl">🌞/🌙</button>
+    <button onclick="goHome()">🏠 Ana Sayfa</button>
+    <button onclick="toggleMode()">🌞/🌙</button>
   </div>
 
   <!-- Ana Menü -->
   <div id="mainMenu" class="animate__animated animate__fadeIn h-screen flex flex-col justify-center items-center gap-10">
-    <div class="menu-card w-3/4 h-1/4 flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-3xl font-bold" onclick="showSubMenu('stok')">
-      📦 Stok Miktarları
-    </div>
-    <div class="menu-card w-3/4 h-1/4 flex items-center justify-center rounded-xl bg-gradient-to-r from-pink-600 to-yellow-500 text-white text-3xl font-bold" onclick="showSubMenu('mal')">
-      📥 Mal Kabul
+    <div class="grid grid-cols-2 gap-6 w-3/4">
+      <div class="menu-tile h-40 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 animate__animated animate__pulse animate__infinite" onclick="showSubMenu('stok')">
+        📦 Stok Miktarları
+      </div>
+      <div class="menu-tile h-40 rounded-xl bg-gradient-to-r from-pink-600 to-yellow-500 animate__animated animate__pulse animate__infinite" onclick="showSubMenu('mal')">
+        📥 Mal Kabul
+      </div>
     </div>
   </div>
 
   <!-- Stok Menü -->
-  <div id="stokMenu" class="hidden fade-enter h-screen flex flex-col justify-center items-center gap-6">
-    <button class="w-3/4 p-6 rounded-xl bg-indigo-600 text-white text-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=185627105&single=true')">Hammadde</button>
-    <button class="w-3/4 p-6 rounded-xl bg-indigo-600 text-white text-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=326121089&single=true')">OPP-BOBİN</button>
-    <button class="w-3/4 p-6 rounded-xl bg-indigo-600 text-white text-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=2101965769&single=true')">OMK-KOLİ</button>
-    <button class="w-3/4 p-6 rounded-xl bg-indigo-600 text-white text-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=1845266626&single=true')">PET-CAM-KAPAK</button>
+  <div id="stokMenu" class="hidden fade-enter h-screen flex flex-col justify-center items-center">
+    <div class="grid grid-cols-2 gap-6 w-3/4">
+      <div class="menu-tile h-32 rounded-xl bg-indigo-600" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=185627105&single=true')">Hammadde</div>
+      <div class="menu-tile h-32 rounded-xl bg-indigo-600" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=326121089&single=true')">OPP-BOBİN</div>
+      <div class="menu-tile h-32 rounded-xl bg-indigo-600" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=2101965769&single=true')">OMK-KOLİ</div>
+      <div class="menu-tile h-32 rounded-xl bg-indigo-600" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=1845266626&single=true')">PET-CAM-KAPAK</div>
+    </div>
   </div>
 
   <!-- Mal Kabul Menü -->
-  <div id="malMenu" class="hidden fade-enter h-screen flex flex-col justify-center items-center gap-6">
-    <button class="w-3/4 p-6 rounded-xl bg-purple-600 text-white text-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=949894360&single=true')">Gelen Hammadde</button>
-    <button class="w-3/4 p-6 rounded-xl bg-purple-600 text-white text-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=908017234&single=true')">Gelen Yardımcı Malzeme</button>
+  <div id="malMenu" class="hidden fade-enter h-screen flex flex-col justify-center items-center">
+    <div class="grid grid-cols-2 gap-6 w-3/4">
+      <div class="menu-tile h-32 rounded-xl bg-purple-600" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=949894360&single=true')">Gelen Hammadde</div>
+      <div class="menu-tile h-32 rounded-xl bg-purple-600" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=908017234&single=true')">Gelen Yardımcı Malzeme</div>
+    </div>
   </div>
 
   <!-- Tablo Görüntüleme -->
-  <div id="sheetView" class="hidden fade-enter mt-12">
+  <div id="sheetView" class="hidden fade-enter mt-16 flex justify-center">
     <iframe id="sheetFrame"></iframe>
   </div>
 
   <!-- JS -->
   <script>
     function showSubMenu(menu){
+      navigator.vibrate?.(100); // titreşim
       document.getElementById('mainMenu').classList.add('hidden');
       if(menu === 'stok'){
         document.getElementById('stokMenu').classList.remove('hidden');
@@ -110,6 +117,7 @@
       }
     }
     function openSheet(url){
+      navigator.vibrate?.([50, 100, 50]); // titreşim pattern
       document.getElementById('stokMenu').classList.add('hidden');
       document.getElementById('malMenu').classList.add('hidden');
       document.getElementById('sheetView').classList.remove('hidden');
