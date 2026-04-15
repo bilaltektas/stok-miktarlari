@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -5,113 +6,115 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Stok Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; transition: background 0.5s, color 0.5s; }
-    .light-mode { background: linear-gradient(135deg,#f8fafc,#e2e8f0); color:#1e293b; }
-    .dark-mode { background: radial-gradient(circle at top left,#0f172a,#1e293b); color:#f1f5f9; }
-    .menu-tile { cursor:pointer; display:flex; align-items:center; justify-content:center;
-      font-size:1.5rem; font-weight:bold; color:#fff; height:120px; width:100%;
-      transition:transform 0.3s ease, box-shadow 0.3s ease; }
-    .menu-tile:hover { transform:scale(1.03); }
-    .dark-mode .menu-tile { box-shadow:0 0 15px #0ff,0 0 30px #0ff; }
-    iframe { border:10px solid #333; border-radius:20px; width:95%; height:80vh; background:#fff; }
-    #topBar { position:fixed; top:0; left:0; right:0; z-index:50; display:flex; justify-content:center;
-      align-items:center; padding:0.5rem 1rem; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); }
-    #topBar button { margin:0 10px; transition:transform 0.3s; font-size:1.5rem; color:#fff; }
-    #topBar button:hover { transform:scale(1.2); }
-    #loading { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:flex; justify-content:center;
-      align-items:center; z-index:100; }
-    #loading.hidden { display:none; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      transition: background 0.5s, color 0.5s;
+    }
+    .menu-card {
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      cursor: pointer;
+    }
+    .menu-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+    iframe {
+      border: none;
+      width: 100%;
+      height: 85vh;
+      background: #fff;
+    }
+    .fade-enter {
+      animation: fadeIn 0.8s;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+    /* Tema */
+    .light-mode {
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      color: #1e293b;
+    }
+    .dark-mode {
+      background: radial-gradient(circle at top left, #0f172a, #1e293b);
+      color: #f1f5f9;
+    }
+    /* Sabit üst menü */
+    #topBar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+    }
+    #topBar button {
+      transition: transform 0.3s;
+    }
+    #topBar button:hover {
+      transform: rotate(10deg) scale(1.1);
+    }
   </style>
 </head>
-<body class="dark-mode">
+<body class="dark-mode p-4">
   <!-- Üst Bar -->
   <div id="topBar">
-    <button onclick="goHome()">🏠 Ana Sayfa</button>
-    <button onclick="toggleMode()">🌞/🌙</button>
+    <button onclick="goHome()" class="text-2xl">🏠</button>
+    <button onclick="toggleMode()" class="text-xl">🌞/🌙</button>
   </div>
 
   <!-- Ana Menü -->
-  <div id="mainMenu" class="h-screen flex flex-col justify-center items-center gap-6">
-    <h1 class="text-3xl font-bold mb-4">Hoş geldin!</h1>
-    <p class="mb-4">Kullanma Talimatı: Menüden seçim yap, tabloyu incele, 🏠 ile geri dön.</p>
-    <input type="text" id="searchBox" placeholder="Ara..." onkeyup="filterTiles()" class="p-2 rounded-lg w-3/4 mb-4">
-    <div class="menu-tile rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600" onclick="showSubMenu('stok')">📦 Stok Miktarları</div>
-    <div class="menu-tile rounded-xl bg-gradient-to-r from-pink-600 to-yellow-500" onclick="showSubMenu('mal')">📥 Mal Kabul</div>
+  <div id="mainMenu" class="animate__animated animate__fadeIn h-screen flex flex-col justify-center items-center gap-10">
+    <div class="menu-card w-3/4 h-1/4 flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-3xl font-bold" onclick="showSubMenu('stok')">
+      📦 Stok Miktarları
+    </div>
+    <div class="menu-card w-3/4 h-1/4 flex items-center justify-center rounded-xl bg-gradient-to-r from-pink-600 to-yellow-500 text-white text-3xl font-bold" onclick="showSubMenu('mal')">
+      📥 Mal Kabul
+    </div>
   </div>
 
   <!-- Stok Menü -->
-  <div id="stokMenu" class="hidden h-screen flex flex-col justify-center items-center gap-6">
-    <div class="menu-tile bg-indigo-600 rounded-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/...gid=185627105&single=true')">Hammadde</div>
-    <div class="menu-tile bg-indigo-600 rounded-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/...gid=326121089&single=true')">OPP-BOBİN</div>
-    <div class="menu-tile bg-indigo-600 rounded-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/...gid=2101965769&single=true')">OMK-KOLİ</div>
-    <div class="menu-tile bg-indigo-600 rounded-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/...gid=1845266626&single=true')">PET-CAM-KAPAK</div>
+  <div id="stokMenu" class="hidden fade-enter h-screen flex flex-col justify-center items-center gap-6">
+    <button class="w-3/4 p-6 rounded-xl bg-indigo-600 text-white text-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=185627105&single=true')">Hammadde</button>
+    <button class="w-3/4 p-6 rounded-xl bg-indigo-600 text-white text-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=326121089&single=true')">OPP-BOBİN</button>
+    <button class="w-3/4 p-6 rounded-xl bg-indigo-600 text-white text-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=2101965769&single=true')">OMK-KOLİ</button>
+    <button class="w-3/4 p-6 rounded-xl bg-indigo-600 text-white text-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=1845266626&single=true')">PET-CAM-KAPAK</button>
   </div>
 
   <!-- Mal Kabul Menü -->
-  <div id="malMenu" class="hidden h-screen flex flex-col justify-center items-center gap-6">
-    <div class="menu-tile bg-purple-600 rounded-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/...gid=949894360&single=true')">Gelen Hammadde</div>
-    <div class="menu-tile bg-purple-600 rounded-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/...gid=908017234&single=true')">Gelen Yardımcı Malzeme</div>
+  <div id="malMenu" class="hidden fade-enter h-screen flex flex-col justify-center items-center gap-6">
+    <button class="w-3/4 p-6 rounded-xl bg-purple-600 text-white text-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=949894360&single=true')">Gelen Hammadde</button>
+    <button class="w-3/4 p-6 rounded-xl bg-purple-600 text-white text-xl" onclick="openSheet('https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=908017234&single=true')">Gelen Yardımcı Malzeme</button>
   </div>
 
   <!-- Tablo Görüntüleme -->
-  <div id="sheetView" class="hidden mt-16 flex justify-center">
+  <div id="sheetView" class="hidden fade-enter mt-12">
     <iframe id="sheetFrame"></iframe>
-  </div>
-
-  <!-- Loading -->
-  <div id="loading" class="hidden">
-    <div class="animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-purple-500"></div>
   </div>
 
   <!-- JS -->
   <script>
-    // Sesli karşılama
-    function greetUser(){
-      const hour = new Date().getHours();
-      let message = "Hoş geldiniz.";
-      if(hour < 12) message = "Günaydın, hoş geldiniz. Stok takibinizi kolayca yapabilirsiniz.";
-      else if(hour < 18) message = "Merhaba, hoş geldiniz. Bugün stok ve mal kabul ekranlarınız hazır.";
-      else message = "İyi akşamlar, hoş geldiniz. Günün son kontrolünü yapabilirsiniz.";
-      const utterance = new SpeechSynthesisUtterance(message);
-      utterance.lang = "tr-TR";
-      speechSynthesis.speak(utterance);
-    }
-    window.onload = greetUser;
-
-    // Arama kutusu
-    function filterTiles(){
-      const query = document.getElementById('searchBox').value.toLowerCase();
-      document.querySelectorAll('.menu-tile').forEach(tile=>{
-        tile.style.display = tile.textContent.toLowerCase().includes(query) ? 'flex' : 'none';
-      });
-    }
-
-    // Tema geçişi
-    function toggleMode(){
-      const body = document.body;
-      if(body.classList.contains('dark-mode')){
-        body.classList.remove('dark-mode'); body.classList.add('light-mode');
-      } else { body.classList.remove('light-mode'); body.classList.add('dark-mode'); }
-    }
-
-    // Menü geçişleri
     function showSubMenu(menu){
-      navigator.vibrate?.(100);
       document.getElementById('mainMenu').classList.add('hidden');
-      if(menu==='stok'){ document.getElementById('stokMenu').classList.remove('hidden'); }
-      else { document.getElementById('malMenu').classList.remove('hidden'); }
+      if(menu === 'stok'){
+        document.getElementById('stokMenu').classList.remove('hidden');
+      } else {
+        document.getElementById('malMenu').classList.remove('hidden');
+      }
     }
     function openSheet(url){
-      navigator.vibrate?.([50,100,50]);
       document.getElementById('stokMenu').classList.add('hidden');
       document.getElementById('malMenu').classList.add('hidden');
-      document.getElementById('loading').classList.remove('hidden');
-      setTimeout(()=>{
-        document.getElementById('loading').classList.add('hidden');
-        document.getElementById('sheetView').classList.remove('hidden');
-        document.getElementById('sheetFrame').src = url;
-      },1500);
+      document.getElementById('sheetView').classList.remove('hidden');
+      document.getElementById('sheetFrame').src = url;
     }
     function goHome(){
       document.getElementById('stokMenu').classList.add('hidden');
@@ -119,14 +122,16 @@
       document.getElementById('sheetView').classList.add('hidden');
       document.getElementById('mainMenu').classList.remove('hidden');
     }
-
-    // Swipe navigasyon
-    let touchStartX=0;
-    document.addEventListener('touchstart',e=>{touchStartX=e.changedTouches[0].screenX;});
-    document.addEventListener('touchend',e=>{
-      let touchEndX=e.changedTouches[0].screenX;
-      if(touchEndX-touchStartX>100){ goHome(); } // sağa kaydırma → ana menü
-    });
+    function toggleMode(){
+      const body = document.body;
+      if(body.classList.contains('dark-mode')){
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+      } else {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+      }
+    }
   </script>
 </body>
 </html>
