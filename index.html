@@ -17,7 +17,6 @@ body{
   color:white;
 }
 
-/* KIOSK LAYER */
 #voiceSelect{
   position:absolute;
   inset:0;
@@ -40,65 +39,16 @@ body{
   align-items:center;
   justify-content:center;
   background:#1f2937;
-  box-shadow:0 10px 30px rgba(0,0,0,0.5);
-  transition:0.2s;
-}
-.voiceBtn:active{transform:scale(0.95)}
-
-.title{
-  font-size:22px;
-  font-weight:bold;
-  opacity:0.9;
 }
 
-/* APP */
-#app{
-  height:100dvh;
-  display:grid;
-  grid-template-rows:auto 1fr;
-}
-
-#topBar{
-  display:flex;
-  justify-content:center;
-  padding:12px;
-  background:rgba(0,0,0,0.5);
-}
-
-.homeBtn{
-  width:56px;height:56px;border-radius:50%;
-  background:linear-gradient(135deg,#4f46e5,#7c3aed);
-  font-size:24px;
-}
-
-/* MENÜ */
-.menu{
-  display:flex;
-  flex-direction:column;
-  height:100%;
-}
-
-.card{
-  flex:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:26px;
-  font-weight:bold;
-}
-
+#app{height:100dvh;display:grid;grid-template-rows:auto 1fr;}
+#topBar{display:flex;justify-content:center;padding:12px;background:rgba(0,0,0,0.5);}
+.homeBtn{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);}
+.menu{display:flex;flex-direction:column;height:100%;}
+.card{flex:1;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:bold;}
 .stok{background:linear-gradient(135deg,#4f46e5,#7c3aed);}
 .mal{background:linear-gradient(135deg,#f97316,#ef4444);}
-
-.sub{
-  flex:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:20px;
-  font-weight:bold;
-}
-
+.sub{flex:1;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:bold;}
 .hidden{display:none!important;}
 
 .hm{background:#4338ca;}
@@ -108,34 +58,23 @@ body{
 .mh1{background:#7c3aed;}
 .mh2{background:#be185d;}
 
-#sheet{
-  height:100%;
-  padding:10px;
-}
-
-iframe{
-  width:100%;
-  height:100%;
-  border:none;
-  border-radius:15px;
-}
+#sheet{height:100%;padding:10px;}
+iframe{width:100%;height:100%;border:none;border-radius:15px;}
 </style>
 </head>
 
 <body>
 
-<!-- 🎤 VOICE SELECT -->
+<!-- VOICE SELECT -->
 <div id="voiceSelect">
-  <div class="title">Ses Asistanını Seç</div>
+  <div style="font-size:22px;font-weight:bold;">Ses Asistanını Seç</div>
 
   <div style="display:flex;gap:20px;">
     <div class="voiceBtn" onclick="selectVoice('female')">👩‍🦰</div>
     <div class="voiceBtn" onclick="selectVoice('male')">👨‍🦱</div>
   </div>
 
-  <div style="opacity:0.6;font-size:14px;">
-    Kadın veya Erkek ses asistanı seçiniz
-  </div>
+  <div style="opacity:0.6;font-size:14px;">Google Türkçe ses seçimi</div>
 </div>
 
 <div id="app">
@@ -144,13 +83,11 @@ iframe{
     <button class="homeBtn" onclick="home()">🏠</button>
   </div>
 
-  <!-- MAIN -->
   <div id="main" class="menu hidden">
     <div class="card stok" onclick="openSub('stok')">Stok Miktarları</div>
     <div class="card mal" onclick="openSub('mal')">Mal Kabul</div>
   </div>
 
-  <!-- STOK -->
   <div id="stok" class="menu hidden">
     <div class="sub hm" onclick="openSheet(urls.hm,'Hammadde Miktarlarını inceleyebilirsiniz.')">Hammadde</div>
     <div class="sub opp" onclick="openSheet(urls.opp,'Bobin Miktarlarını inceleyebilirsiniz.')">OPP - BOBİN</div>
@@ -158,13 +95,11 @@ iframe{
     <div class="sub pet" onclick="openSheet(urls.pet,'PET - CAM ve KAPAK Miktarlarını inceleyebilirsiniz.')">PET</div>
   </div>
 
-  <!-- MAL -->
   <div id="mal" class="menu hidden">
     <div class="sub mh1" onclick="openSheet(urls.mh1,'Mal Kabulü gerçekleşen hammaddeleri inceyebilirsiniz.')">Gelen Hammadde</div>
     <div class="sub mh2" onclick="openSheet(urls.mh2,'Mal kabulü gerçekleşen ambalaj , koli , kapak , şişe ve benzeri malzemeleri inceleyebilirsiniz.')">Yardımcı Malzeme</div>
   </div>
 
-  <!-- SHEET -->
   <div id="sheet" class="hidden">
     <iframe id="frame"></iframe>
   </div>
@@ -183,7 +118,7 @@ const urls={
 
 let voiceType="female";
 
-/* FULLSCREEN KIOSK */
+/* FULLSCREEN */
 function goFull(){
   const el=document.documentElement;
   if(el.requestFullscreen) el.requestFullscreen();
@@ -218,7 +153,6 @@ function openSheet(url,text){
   document.getElementById("sheet").classList.remove("hidden");
 
   document.getElementById("frame").src=url;
-
   speak(text);
 }
 
@@ -232,31 +166,48 @@ function home(){
   speak("Anasayfa'ya geri döndünüz.");
 }
 
-/* SPEECH ENGINE */
+/* 🔊 GOOGLE NATURAL VOICE ENGINE */
 function speak(text){
   const msg=new SpeechSynthesisUtterance(text);
   msg.lang="tr-TR";
   msg.rate=0.95;
 
-  let voices=speechSynthesis.getVoices();
+  const voices=speechSynthesis.getVoices();
 
-  if(voiceType==="female"){
-    msg.voice = voices.find(v=>v.lang.includes("tr") && v.name.toLowerCase().includes("female")) 
-             || voices.find(v=>v.lang.includes("tr"));
-  }else{
-    msg.voice = voices.find(v=>v.lang.includes("tr") && v.name.toLowerCase().includes("male")) 
-             || voices.find(v=>v.lang.includes("tr"));
+  function pickVoice(list){
+    // 1. Google voices (en doğal)
+    let v = list.find(v =>
+      v.lang.includes("tr") &&
+      v.name.toLowerCase().includes("google")
+    );
+
+    // 2. gender filter (best effort)
+    if(!v){
+      v = list.find(v =>
+        v.lang.includes("tr") &&
+        v.name.toLowerCase().includes(voiceType === "female" ? "female" : "male")
+      );
+    }
+
+    // 3. fallback TR
+    if(!v){
+      v = list.find(v => v.lang.includes("tr"));
+    }
+
+    return v;
   }
+
+  const selectedVoice = pickVoice(voices);
+  if(selectedVoice) msg.voice = selectedVoice;
 
   speechSynthesis.cancel();
   speechSynthesis.speak(msg);
 }
 
-/* voice load fix */
-window.speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
-
-/* auto unlock fallback */
-document.addEventListener("click",()=>speechSynthesis.getVoices(),{once:true});
+/* FIX VOICES LOAD */
+window.speechSynthesis.onvoiceschanged = () => {
+  speechSynthesis.getVoices();
+};
 </script>
 
 </body>
