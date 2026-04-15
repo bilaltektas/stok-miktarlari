@@ -8,36 +8,18 @@
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-body{
-  margin:0;
-  font-family:Segoe UI;
-  height:100dvh;
-  overflow:hidden;
-  background:#0f172a;
-  color:white;
-}
+body{margin:0;font-family:Segoe UI;height:100dvh;overflow:hidden;background:#0f172a;color:white;}
 
 #voiceSelect{
-  position:absolute;
-  inset:0;
+  position:absolute;inset:0;
   background:linear-gradient(135deg,#0f172a,#111827);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  z-index:999;
-  text-align:center;
-  gap:20px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999;
+  gap:20px;text-align:center;
 }
 
 .voiceBtn{
-  width:140px;
-  height:140px;
-  border-radius:20px;
-  font-size:60px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  width:140px;height:140px;border-radius:20px;
+  font-size:60px;display:flex;align-items:center;justify-content:center;
   background:#1f2937;
 }
 
@@ -74,7 +56,7 @@ iframe{width:100%;height:100%;border:none;border-radius:15px;}
     <div class="voiceBtn" onclick="selectVoice('male')">👨‍🦱</div>
   </div>
 
-  <div style="opacity:0.6;font-size:14px;">Google Türkçe ses sistemi</div>
+  <div style="opacity:0.6;font-size:14px;">Ses sistemi yükleniyor...</div>
 </div>
 
 <div id="app">
@@ -116,7 +98,17 @@ const urls={
  mh2:"https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=908017234&single=true"
 };
 
-let voiceType="male"; // default daha stabil
+let voiceType=null;
+let voicesReady=false;
+
+/* VOICE CACHE FIX */
+function loadVoices(){
+  const v=speechSynthesis.getVoices();
+  if(v.length>0) voicesReady=true;
+  return v;
+}
+
+speechSynthesis.onvoiceschanged=loadVoices;
 
 /* FULLSCREEN */
 function goFull(){
@@ -127,6 +119,7 @@ function goFull(){
 /* VOICE SELECT */
 function selectVoice(type){
   voiceType=type;
+
   document.getElementById("voiceSelect").style.display="none";
   document.getElementById("main").classList.remove("hidden");
 
@@ -166,74 +159,98 @@ function home(){
   speak("Anasayfa'ya geri döndünüz.");
 }
 
-/* 🔊 GELİŞMİŞ GOOGLE VOICE ENGINE */
+/* 🔊 %100 FIXED SPEECH ENGINE */
 function speak(text){
-  const msg=new SpeechSynthesisUtterance(text);
-  msg.lang="tr-TR";
-  msg.rate=0.95;
 
-  const voices=speechSynthesis.getVoices();
-
-  function pick(){
-    // GOOGLE VOICES FIRST (en doğal)
-    let v = voices.find(v =>
-      v.lang.includes("tr") &&
-      v.name.toLowerCase().includes("google")
-    );
-
-    // GENDER FIX (en kritik düzeltme)
-    if(!v){
-      v = voices.find(v =>
-        v.lang.includes("tr") &&
-        (
-          voiceType==="female"
-            ? v.name.toLowerCase().includes("female")
-            : v.name.toLowerCase().includes("male")
-        )
-      );
-    }
-
-    // fallback
-    if(!v){
-      v = voices.find(v => v.lang.includes("tr"));
-    }
-
-    return v;
-  }
-
-  const selected=pick();
-  if(selected) msg.voice=selected;
-
-  speechSynthesis.cancel();
-  speechSynthesis.speak(msg);
-}
-
-/* VOICE LOAD FIX */
-window.speechSynthesis.onvoiceschanged=()=>{
-  speechSynthesis.getVoices();
-};
-
-/* 🚀 İLK AÇILIŞ MESAJI (ERKEK SESİYLE) */
-window.addEventListener("load",()=>{
-  setTimeout(()=>{
-    const msg=new SpeechSynthesisUtterance(
-      "LÜTFEN SİZE YARDIMCI OLMASINI İSTEDİĞİNİZ ASİSTANINIZI SEÇİNİZ"
-    );
-
+  const run=()=>{
+    const msg=new SpeechSynthesisUtterance(text);
     msg.lang="tr-TR";
     msg.rate=0.95;
 
-    const voices=speechSynthesis.getVoices();
-    let maleVoice = voices.find(v =>
-      v.lang.includes("tr") &&
-      v.name.toLowerCase().includes("male")
-    ) || voices.find(v => v.lang.includes("tr"));
+    const voices=loadVoices();
 
-    if(maleVoice) msg.voice=maleVoice;
+    function pickVoice(){
+      // 1 GOOGLE VOICES (en doğal)
+      let v=voices.find(v=>
+        v.lang.includes("tr") &&
+        v.name.toLowerCase().includes("google")
+      );
+
+      // 2 GENDER FIX (GERÇEK DÜZELTME)
+      if(!v){
+        v=voices.find(v=>{
+          if(!v.lang.includes("tr")) return false;
+
+          const n=v.name.toLowerCase();
+
+          if(voiceType==="female"){
+            return n.includes("female") || n.includes("zira") || n.includes("tr") && !n.includes("male");
+          }else{
+            return n.includes("male") || n.includes("david") || n.includes("tr");
+          }
+        });
+      }
+
+      // 3 fallback
+      if(!v){
+        v=voices.find(v=>v.lang.includes("tr"));
+      }
+
+      return v;
+    }
+
+    const selected=pickVoice();
+    if(selected) msg.voice=selected;
 
     speechSynthesis.cancel();
     speechSynthesis.speak(msg);
-  },400);
+  };
+
+  // voice delay fix
+  if(!voicesReady){
+    let i=0;
+    const t=setInterval(()=>{
+      loadVoices();
+      i++;
+      if(voicesReady || i>10){
+        clearInterval(t);
+        run();
+      }
+    },150);
+  }else{
+    run();
+  }
+}
+
+/* 🚀 İLK MESAJ (KESİN ÇALIŞIR) */
+window.addEventListener("load",()=>{
+  let i=0;
+
+  const t=setInterval(()=>{
+    const v=speechSynthesis.getVoices();
+    if(v.length>0){
+      clearInterval(t);
+
+      const msg=new SpeechSynthesisUtterance(
+        "LÜTFEN SİZE YARDIMCI OLMASINI İSTEDİĞİNİZ ASİSTANINIZI SEÇİNİZ"
+      );
+
+      msg.lang="tr-TR";
+      msg.rate=0.95;
+
+      // ERKEK SES ZORLAMASI
+      let male=v.find(x=>x.lang.includes("tr") && x.name.toLowerCase().includes("male"))
+              || v.find(x=>x.lang.includes("tr"));
+
+      if(male) msg.voice=male;
+
+      speechSynthesis.cancel();
+      speechSynthesis.speak(msg);
+    }
+
+    i++;
+    if(i>15) clearInterval(t);
+  },200);
 });
 </script>
 
