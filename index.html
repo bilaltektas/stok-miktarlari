@@ -24,7 +24,6 @@ body {
   grid-template-rows: auto 1fr;
 }
 
-/* TOP BAR */
 #topBar {
   position: sticky;
   top: 0;
@@ -48,17 +47,14 @@ body {
   align-items: center;
   justify-content: center;
   box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
-.homeBtn:active {
-  transform: scale(0.92);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
-}
+.homeBtn:active { transform: scale(0.92); }
 
 .hidden { display: none !important; }
 
-/* MAIN MENU */
+/* MAIN */
 #mainMenu {
   height: 100%;
   display: flex;
@@ -72,7 +68,6 @@ body {
   justify-content: center;
   font-size: 1.6rem;
   font-weight: bold;
-  color: white;
   transition: transform 0.2s;
 }
 
@@ -81,7 +76,7 @@ body {
 .stok { background: linear-gradient(135deg,#4f46e5,#7c3aed); }
 .mal { background: linear-gradient(135deg,#f97316,#ef4444); }
 
-/* SUB MENU */
+/* SUB */
 .subMenu {
   height: 100%;
   display: flex;
@@ -95,7 +90,6 @@ body {
   justify-content: center;
   font-size: 1.4rem;
   font-weight: bold;
-  color: white;
 }
 
 /* COLORS */
@@ -118,22 +112,12 @@ body {
   border-radius: 18px;
   overflow: hidden;
   background: white;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
 
 iframe {
   width: 100%;
   height: 100%;
   border: none;
-}
-
-.floatingHint {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 12px;
-  opacity: 0.5;
 }
 </style>
 </head>
@@ -146,28 +130,31 @@ iframe {
     <button class="homeBtn" onclick="home()">🏠</button>
   </div>
 
+  <!-- MAIN -->
   <div id="mainMenu">
     <div class="menu-card stok" onclick="showSubMenu('stok')">📦 Stok Miktarları</div>
     <div class="menu-card mal" onclick="showSubMenu('mal')">📥 Mal Kabul</div>
   </div>
 
+  <!-- STOK -->
   <div id="stokMenu" class="hidden subMenu">
     <div class="subItem hm" onclick="openSheet(urls.hm,'Hammadde')">Hammadde</div>
-    <div class="subItem opp" onclick="openSheet(urls.opp,'OPP bobin')">OPP - BOBİN</div>
-    <div class="subItem omk" onclick="openSheet(urls.omk,'OMK koli')">OMK - KOLİ</div>
-    <div class="subItem pet" onclick="openSheet(urls.pet,'PET cam kapak')">PET - CAM - KAPAK</div>
+    <div class="subItem opp" onclick="openSheet(urls.opp,'OPP - BOBİN')">OPP - BOBİN</div>
+    <div class="subItem omk" onclick="openSheet(urls.omk,'OMK - KOLİ')">OMK - KOLİ</div>
+    <div class="subItem pet" onclick="openSheet(urls.pet,'PET - CAM - KAPAK')">PET - CAM - KAPAK</div>
   </div>
 
+  <!-- MAL -->
   <div id="malMenu" class="hidden subMenu">
-    <div class="subItem mh1" onclick="openSheet(urls.mh1,'Gelen hammadde')">Gelen Hammadde</div>
-    <div class="subItem mh2" onclick="openSheet(urls.mh2,'Yardımcı malzeme')">Yardımcı Malzeme</div>
+    <div class="subItem mh1" onclick="openSheet(urls.mh1,'Gelen Hammadde')">Gelen Hammadde</div>
+    <div class="subItem mh2" onclick="openSheet(urls.mh2,'Yardımcı Malzeme')">Yardımcı Malzeme</div>
   </div>
 
+  <!-- SHEET -->
   <div id="sheetView" class="hidden">
     <div class="frameBox">
       <iframe id="frame"></iframe>
     </div>
-    <div class="floatingHint">Çıkmak için 🏠</div>
   </div>
 
 </div>
@@ -182,21 +169,39 @@ const urls = {
   mh2: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=908017234&single=true"
 };
 
+/* SES METİNLERİ */
+const speechMap = {
+  main_stok: "Stok Miktarlarını inceleyebilirsiniz.",
+  main_mal: "Mal Kabul detaylarını inceyebilirsiniz.",
+
+  hm: "Hammadde Miktarlarını inceleyebilirsiniz.",
+  opp: "Bobin Miktarlarını inceleyebilirsiniz.",
+  omk: "Koli Miktarlarını inceleyebilirsiniz.",
+  pet: "PET - CAM ve KAPAK Miktarlarını inceleyebilirsiniz.",
+
+  mh1: "Mal Kabulü gerçekleşen hammaddeleri inceyebilirsiniz.",
+  mh2: "Mal kabulü gerçekleşen ambalaj , koli , kapak , şişe ve benzeri malzemeleri inceleyebilirsiniz.",
+
+  home: "Anasayfa'ya geri döndünüz."
+};
+
 /* MENÜ */
 function showSubMenu(type){
   document.getElementById("mainMenu").classList.add("hidden");
   document.getElementById(type === "stok" ? "stokMenu" : "malMenu").classList.remove("hidden");
+
+  speak(type === "stok" ? speechMap.main_stok : speechMap.main_mal);
 }
 
 /* SHEET */
-function openSheet(url, name){
+function openSheet(url, key){
   document.getElementById("stokMenu").classList.add("hidden");
   document.getElementById("malMenu").classList.add("hidden");
   document.getElementById("sheetView").classList.remove("hidden");
 
   document.getElementById("frame").src = url;
 
-  speakScreen(name);
+  speak(speechMap[key]);
 }
 
 /* HOME */
@@ -205,34 +210,13 @@ function home(){
   document.getElementById("stokMenu").classList.add("hidden");
   document.getElementById("malMenu").classList.add("hidden");
   document.getElementById("sheetView").classList.add("hidden");
+
+  speak(speechMap.home);
 }
 
-/* SES */
-function speakScreen(name){
-  const msg = new SpeechSynthesisUtterance(name + " ekranı açıldı");
-  msg.lang = "tr-TR";
-  msg.rate = 0.95;
-
-  speechSynthesis.cancel();
-
-  const voices = speechSynthesis.getVoices();
-  const tr = voices.find(v => v.lang.includes("tr"));
-  if(tr) msg.voice = tr;
-
-  speechSynthesis.speak(msg);
-}
-
-/* HOŞ GELDİN */
-let spoken = false;
-
-function speakWelcome(){
-  if(spoken) return;
-  spoken = true;
-
-  const msg = new SpeechSynthesisUtterance(
-    "Merhaba. Stok yönetim paneline hoş geldiniz. Menüden stok ve mal kabul ekranlarına ulaşabilirsiniz."
-  );
-
+/* TEK SES MOTORU */
+function speak(text){
+  const msg = new SpeechSynthesisUtterance(text);
   msg.lang = "tr-TR";
   msg.rate = 0.95;
 
@@ -244,24 +228,34 @@ function speakWelcome(){
   speechSynthesis.speak(msg);
 }
 
-/* 🚀 SAYFA AÇILINCA SES (AUTO START) */
+/* 🚀 AUTO WELCOME */
+let welcomed = false;
+
+function welcome(){
+  if(welcomed) return;
+  welcomed = true;
+
+  speak("Merhaba. Stok yönetim paneline hoş geldiniz. Menüden stok ve mal kabul ekranlarına ulaşabilirsiniz.");
+}
+
+/* SAYFA AÇILIŞ */
 window.addEventListener("load", () => {
   setTimeout(() => {
-    const trySpeak = () => {
+    const tryLoad = () => {
       const voices = speechSynthesis.getVoices();
-      if (!voices || voices.length === 0) {
-        setTimeout(trySpeak, 200);
+      if(!voices || voices.length === 0){
+        setTimeout(tryLoad, 200);
         return;
       }
-      speakWelcome();
+      welcome();
     };
-    trySpeak();
+    tryLoad();
   }, 300);
 });
 
-/* fallback kullanıcı etkileşimi */
-document.addEventListener("click", speakWelcome, { once: true });
-document.addEventListener("touchstart", speakWelcome, { once: true });
+/* fallback */
+document.addEventListener("click", welcome, { once:true });
+document.addEventListener("touchstart", welcome, { once:true });
 
 </script>
 
