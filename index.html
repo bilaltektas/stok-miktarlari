@@ -21,7 +21,10 @@ header{
   font-weight:bold;
 }
 
-.screen{display:none;height:calc(100vh - 50px);}
+.screen{
+  display:none;
+  height:calc(100vh - 50px); /* üst header hariç tüm ekran */
+}
 .screen.active{display:block;}
 
 .fade{animation:fade .2s ease-in-out;}
@@ -88,7 +91,7 @@ iframe, object{
 <!-- HAMMADDE PDF -->
 <div id="hammadde" class="screen fade">
   <div class="top">
-    <button class="back" onclick="backHome()">←</button>
+    <button class="back" onclick="backHome()">← Ana Sayfa</button>
   </div>
   <iframe 
     src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pub?gid=185627105&single=true&output=pdf">
@@ -98,7 +101,7 @@ iframe, object{
 <!-- MAL KABUL -->
 <div id="malkabul" class="screen fade">
   <div class="top">
-    <button class="back" onclick="backHome()">←</button>
+    <button class="back" onclick="backHome()">← Ana Sayfa</button>
   </div>
   <p>Mal kabul ekranı burada olacak.</p>
 </div>
