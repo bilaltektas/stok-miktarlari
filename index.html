@@ -3,354 +3,246 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mobil Stok Asistanı - Sinema Modu</title>
+<title>Depo Panel</title>
 
 <style>
-:root{
-  --glass: rgba(255,255,255,0.12);
-  --blur: blur(18px);
-}
-
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
 body{
   margin:0;
-  font-family:'Segoe UI',sans-serif;
-  color:white;
-  overflow-x:hidden;
-  scroll-behavior:smooth;
-  background:black;
+  font-family:Arial;
+  background:#f5f6fa;
 }
 
-canvas{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  z-index:-1;
-}
-
-section{
-  min-height:100vh;
-  padding:30px 15px;
+header{
+  background:#2f3640;
+  color:#fff;
+  padding:14px;
   text-align:center;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
+  font-weight:bold;
 }
 
-.grid{
+.screen{display:none;padding:12px;}
+.screen.active{display:block;}
+
+.fade{animation:fade .2s ease-in-out;}
+@keyframes fade{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* MENU */
+.menu{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-  gap:15px;
-  width:100%;
-  max-width:500px;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+
+.btn{
+  background:#fff;
+  padding:18px;
+  border-radius:14px;
+  font-weight:bold;
+  box-shadow:0 2px 10px rgba(0,0,0,.08);
+  cursor:pointer;
+  transition:.2s;
+}
+
+.btn:active{transform:scale(.97);}
+
+/* TOP */
+.top{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.back{
+  background:#40739e;
+  color:#fff;
+  border:none;
+  padding:10px;
+  border-radius:10px;
+}
+
+input{
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+/* CARDS */
+.list{
+  display:grid;
+  gap:10px;
 }
 
 .card{
-  padding:20px;
-  border-radius:20px;
-  backdrop-filter:var(--blur);
-  background:var(--glass);
-  border:1px solid rgba(255,255,255,0.2);
-  font-weight:bold;
-  transition:0.3s;
-  cursor:pointer;
+  background:#fff;
+  padding:12px;
+  border-radius:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+  border-left:6px solid green;
 }
 
-.card:hover{ transform:translateY(-5px); }
-.card:active{ transform:scale(0.95); }
-
-input{
-  width:90%;
-  max-width:300px;
-  padding:18px;
-  font-size:18px;
-  border-radius:15px;
-  border:none;
-  text-align:center;
-  margin-top:15px;
-}
-
-button{
-  margin-top:20px;
-  padding:18px 35px;
-  border:none;
-  border-radius:20px;
-  font-size:18px;
-  font-weight:bold;
-  cursor:pointer;
-  background:linear-gradient(45deg,#00e5ff,#2979ff);
-  color:white;
-  transition:0.3s;
-}
-
-button:hover{ transform:translateY(-3px); }
-button:active{ transform:scale(0.95); }
-
-.result{
-  margin-top:30px;
-  font-size:22px;
-  font-weight:bold;
-}
-
-.topBtn{
-  position:fixed;
-  top:20px;
-  left:50%;
-  transform:translateX(-50%);
-  display:none;
-  z-index:999;
+/* RESPONSIVE */
+@media(min-width:768px){
+  .menu{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
 
 <body>
 
-<canvas id="galaxy"></canvas>
+<header id="title">ANA SAYFA</header>
 
-<button class="topBtn" id="resetBtn" onclick="resetApp()">🔄 Yeni Stok Sorgula</button>
-
-<section id="firms">
-<h1>🏢 Firma Seçiniz</h1>
-<div class="grid">
-<div class="card" onclick="selectFirm('BİM')">🟢 BİM</div>
-<div class="card" onclick="selectFirm('FİLE')">🔵 FİLE</div>
-<div class="card" onclick="selectFirm('METRO')">🟠 METRO</div>
-<div class="card" onclick="selectFirm('KNORR')">🔴 KNORR</div>
+<!-- HOME -->
+<div id="home" class="screen active fade">
+  <div class="menu">
+    <div class="btn" onclick="openMenu('STOK')">STOK MİKTARLARI</div>
+    <div class="btn" onclick="openMenu('MALKABUL')">MAL KABUL</div>
+  </div>
 </div>
-</section>
 
-<section id="productsSection">
-<h2 id="productTitle"></h2>
-<div class="grid" id="products"></div>
-</section>
+<!-- SUB -->
+<div id="sub" class="screen fade">
+  <div class="top">
+    <button class="back" onclick="backHome()">←</button>
+  </div>
+  <div id="submenu" class="menu"></div>
+</div>
 
-<section id="stockSection">
-<h2 id="stockTitle"></h2>
-<input type="number" id="stockInput" placeholder="📦 Depodaki KG miktarı">
-<button onclick="calculate()">🚀 SORGULA</button>
-<div id="result" class="result"></div>
-</section>
+<!-- TABLE -->
+<div id="table" class="screen fade">
+  <div class="top">
+    <button class="back" onclick="backSub()">←</button>
+    <input id="search" placeholder="Ara..." onkeyup="render()">
+  </div>
+  <div id="list" class="list"></div>
+</div>
 
 <script>
+/* =========================
+   GOOGLE SHEETS CSV LINKS
+   (Publish to web - CSV)
+========================= */
+const SHEETS = {
+  "HAMMADDE":
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pub?gid=185627105&single=true&output=csv",
 
-/* ==================== VERİ ==================== */
-const data={
-"BİM":{"KİMYON":20000,"HİNDİSTAN CEVİZİ":30000,"NANE":10000,"SUSAM":25000,"TARÇIN":10000,"ÇÖREKOTU":15000,"PUL BİBER":80000,"KARABİBER":30000,"ACI TOZ BİBER":15000,"TATLI TOZ BİBER":15000,"KEKİK":15000,"GALETA UNU":150000,"MISIR UNU":150000},
-"FİLE":{"KARABİBER":3000,"TARÇIN":3000,"ZERDEÇAL":3000,"KEKİK":5000,"İSOT":10000},
-"METRO":{"TATLI TOZ BİBER":1000,"ÇİLEKLİ PUDİNG":2000,"ÇÖREK OTU":1000,"HİNDİSTAN CEVİZİ":2000,"İSOT":1500,"KAKAOLU PUDİNG":5000,"KARABİBER":5000,"KARANFİL":250,"KEKİK":2500,"KİMYON":3000,"KÖRİ":1000,"KUŞ ÜZÜMÜ":1000,"LİMON TUZU":3000,"MAVİ HAŞHAŞ":500,"MUZLU PUDİNG":2000,"NANE":3000,"PANKO":15000,"PUL BİBER":20000,"TOZ SARIMSAK":1000,"SUMAK":3000,"SUSAM":2000,"TANE KARABİBER":500,"TARÇIN":300,"TEMPURA UNU":500,"VANİLYALI PUDİNG":1000,"YENİBAHAR":250,"TOZ ZERDEÇAL":500},
-"KNORR":{"ÇÖREKOTU":2000,"HİNDİSTAN CEVİZİ":2000,"KARABİBER":5000,"KARANFİL":500,"KEKİK":2500,"KİMYON":3000,"KÖRİ":2000,"NANE":2000,"PANKO":5000,"PUL BİBER":5000,"TARÇIN":2000,"TATLI TOZ BİBER":5000,"ZENCEFİL":2000,"ZERDEÇAL":3000}
+  "OPP-BOBIN":
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pub?gid=326121089&single=true&output=csv"
 };
 
-let selectedFirm=null;
-let selectedProduct=null;
+const MENUS = {
+  STOK: ["HAMMADDE","OPP-BOBIN"],
+  MALKABUL: []
+};
 
-/* ==================== SES ==================== */
-function speak(text){
-  speechSynthesis.cancel();
-  let msg=new SpeechSynthesisUtterance(text);
-  msg.lang="tr-TR";
-  speechSynthesis.speak(msg);
-}
+let data=[];
 
-function formatNumber(num){
-  return num.toLocaleString("tr-TR");
-}
+/* =========================
+   NAVIGATION
+========================= */
+function openMenu(type){
+  document.getElementById("home").classList.remove("active");
+  document.getElementById("sub").classList.add("active");
+  document.getElementById("title").innerText=type;
 
-/* ==================== FİRMA & ÜRÜN ==================== */
-function selectFirm(firm){
-  selectedFirm=firm;
-  speak(firm+" firması seçildi.");
-  const container=document.getElementById("products");
-  container.innerHTML="";
-  document.getElementById("productTitle").innerText="📦 "+firm+" Ürünleri";
-  for(let p in data[firm]){
-    container.innerHTML+=`<div class="card" onclick="selectProduct('${p}')">✨ ${p}</div>`;
-  }
-  document.getElementById("productsSection").scrollIntoView({behavior:"smooth"});
-}
+  const box=document.getElementById("submenu");
+  box.innerHTML="";
 
-function selectProduct(product){
-  selectedProduct=product;
-  speak(product+" hammaddesi seçildi.");
-  document.getElementById("stockTitle").innerText="📊 "+product+" Stok Giriniz";
-  document.getElementById("stockSection").scrollIntoView({behavior:"smooth"});
-  triggerSpiceEffect(product);
-}
-
-/* ==================== HESAP ==================== */
-function calculate(){
-  let current=parseFloat(document.getElementById("stockInput").value)||0;
-  let min=data[selectedFirm][selectedProduct];
-  let diff=min-current;
-  const result=document.getElementById("result");
-
-  if(diff===0){
-    result.innerHTML="✅ Stok tam yeterli.";
-    speak("Stok tam yeterli.");
-    pulseGalaxy("blue");
-  }
-  else if(diff<0){
-    let fazla=Math.abs(diff);
-    result.innerHTML="🟢 "+formatNumber(fazla)+" kilogram fazla.";
-    speak(formatNumber(fazla)+" kilogram fazla.");
-    pulseGalaxy("blue");
-  }
-  else{
-    let eksik=diff;
-    let ton=Math.ceil(eksik/1000);
-
-    if(eksik<1000){
-      result.innerHTML="🔴 "+formatNumber(eksik)+" kilogram eksik.<br><br>🚛 "+eksik+" kilogram sipariş vermelisin.";
-      speak(formatNumber(eksik)+" kilogram eksik. "+eksik+" kilogram sipariş vermelisin.");
-    }else{
-      result.innerHTML="🔴 "+formatNumber(eksik)+" kilogram eksik.<br><br>🚛 "+ton+" ton sipariş vermelisin.";
-      speak(formatNumber(eksik)+" kilogram eksik. "+ton+" ton sipariş vermelisin.");
-    }
-    pulseGalaxy("red");
-  }
-
-  document.getElementById("resetBtn").style.display="block";
-}
-
-/* ==================== RESET ==================== */
-function resetApp(){
-  selectedFirm=null;
-  selectedProduct=null;
-  document.getElementById("products").innerHTML="";
-  document.getElementById("result").innerHTML="";
-  document.getElementById("stockInput").value="";
-  document.getElementById("resetBtn").style.display="none";
-  window.scrollTo({top:0,behavior:"smooth"});
-  speak("Yeni stok sorgulama başlatıldı.");
-}
-
-/* ==================== SİNEMA GALAKSİ ==================== */
-const canvas=document.getElementById("galaxy");
-const ctx=canvas.getContext("2d");
-let w,h;
-let stars=[];
-let meteors=[];
-let spiceParticles=[];
-let galaxyPulse=null;
-
-function resize(){
-  w=canvas.width=window.innerWidth;
-  h=canvas.height=window.innerHeight;
-}
-window.addEventListener("resize",resize);
-resize();
-
-/* Yıldız Katmanları */
-for(let i=0;i<300;i++){
-  stars.push({
-    x:Math.random()*w,
-    y:Math.random()*h,
-    z:Math.random()*2,
-    size:Math.random()*2
+  MENUS[type].forEach(x=>{
+    const d=document.createElement("div");
+    d.className="btn";
+    d.innerText=x;
+    d.onclick=()=>loadSheet(x);
+    box.appendChild(d);
   });
 }
 
-/* Spiral Galaksi Merkezi */
-function drawGalaxyCore(){
-  let gradient=ctx.createRadialGradient(w/2,h/2,10,w/2,h/2,300);
-  gradient.addColorStop(0,"rgba(255,255,255,0.6)");
-  gradient.addColorStop(0.3,"rgba(100,150,255,0.2)");
-  gradient.addColorStop(1,"transparent");
-  ctx.fillStyle=gradient;
-  ctx.beginPath();
-  ctx.arc(w/2,h/2,300,0,Math.PI*2);
-  ctx.fill();
+function backHome(){
+  document.getElementById("sub").classList.remove("active");
+  document.getElementById("home").classList.add("active");
+  document.getElementById("title").innerText="ANA SAYFA";
 }
 
-/* Ana Çizim Döngüsü */
-function animate(){
-  ctx.clearRect(0,0,w,h);
+function backSub(){
+  document.getElementById("table").classList.remove("active");
+  document.getElementById("sub").classList.add("active");
+}
 
-  drawGalaxyCore();
-
-  stars.forEach(s=>{
-    ctx.globalAlpha=0.8;
-    ctx.fillStyle="white";
-    ctx.beginPath();
-    ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
-    ctx.fill();
-    s.y+=0.2+s.z*0.3;
-    if(s.y>h) s.y=0;
-  });
-
-  meteors.forEach((m,i)=>{
-    ctx.strokeStyle="white";
-    ctx.beginPath();
-    ctx.moveTo(m.x,m.y);
-    ctx.lineTo(m.x-80,m.y+20);
-    ctx.stroke();
-    m.x+=8; m.y-=3; m.life--;
-    if(m.life<=0) meteors.splice(i,1);
-  });
-
-  spiceParticles.forEach((p,i)=>{
-    ctx.fillStyle=p.color;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,3,0,Math.PI*2);
-    ctx.fill();
-    p.y+=p.speed;
-    p.life--;
-    if(p.life<=0) spiceParticles.splice(i,1);
-  });
-
-  if(galaxyPulse){
-    ctx.fillStyle=galaxyPulse;
-    ctx.globalAlpha=0.08;
-    ctx.fillRect(0,0,w,h);
+/* =========================
+   FETCH CSV
+========================= */
+async function loadSheet(name){
+  const url=SHEETS[name];
+  if(!url){
+    alert("Sheet linki yok");
+    return;
   }
 
-  requestAnimationFrame(animate);
+  document.getElementById("sub").classList.remove("active");
+  document.getElementById("table").classList.add("active");
+  document.getElementById("title").innerText=name;
+
+  try{
+    const res=await fetch(url);
+    const text=await res.text();
+    data=parseCSV(text);
+    render();
+  }catch(e){
+    alert("Veri çekilemedi (Google Sheets erişim sorunu)");
+    console.error(e);
+  }
 }
-animate();
 
-/* Meteor Rastgele */
-setInterval(()=>{
-  meteors.push({x:Math.random()*w,y:h,life:40});
-},4000);
+/* =========================
+   CSV PARSER
+========================= */
+function parseCSV(text){
+  const lines=text.trim().split("\n");
+  const headers=lines[0].split(",");
 
-/* Tıklama Yıldızı */
-document.addEventListener("click",e=>{
-  meteors.push({x:e.clientX,y:e.clientY,life:25});
-});
-
-/* Ürün 3D Efekt */
-function triggerSpiceEffect(product){
-  let color="white";
-  if(product.includes("BİBER")) color="red";
-  else if(product.includes("NANE")) color="lime";
-  else if(product.includes("ZERDEÇAL")) color="gold";
-  else if(product.includes("KARABİBER")) color="gray";
-
-  for(let i=0;i<80;i++){
-    spiceParticles.push({
-      x:Math.random()*w,
-      y:-10,
-      speed:Math.random()*2+1,
-      life:120,
-      color:color
+  return lines.slice(1).map(line=>{
+    const values=line.split(",");
+    let obj={};
+    headers.forEach((h,i)=>{
+      obj[h.trim()]=(values[i]||"").replace(/"/g,"").trim();
     });
-  }
+    return obj;
+  });
 }
 
-/* Galaxy Pulse */
-function pulseGalaxy(type){
-  if(type==="red") galaxyPulse="red";
-  else galaxyPulse="blue";
-  setTimeout(()=>{ galaxyPulse=null; },800);
-}
+/* =========================
+   RENDER
+========================= */
+function render(){
+  const q=document.getElementById("search").value.toLowerCase();
+  const box=document.getElementById("list");
+  box.innerHTML="";
 
+  data
+  .filter(x=>JSON.stringify(x).toLowerCase().includes(q))
+  .forEach(x=>{
+    const stok=Number(x.Stok)||0;
+    let color="green";
+    if(stok<5) color="red";
+    else if(stok<20) color="orange";
+
+    const d=document.createElement("div");
+    d.className="card";
+    d.style.borderLeft="6px solid "+color;
+
+    d.innerHTML=`
+      <b>${x.Ürün || "Ürün"}</b><br>
+      <small>${x.Kategori || "-"}</small><br>
+      <small>${x.Açıklama || "-"}</small><br>
+      <b>Stok: ${stok}</b>
+    `;
+    box.appendChild(d);
+  });
+}
 </script>
+
 </body>
 </html>
