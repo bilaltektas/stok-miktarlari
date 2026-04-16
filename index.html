@@ -115,6 +115,8 @@ body{
 
 .hidden{display:none!important;}
 
+/* RENKLER */
+.mam{background:#0ea5e9;}
 .hm{background:#4338ca;}
 .opp{background:#dc2626;}
 .omk{background:#2563eb;}
@@ -154,18 +156,22 @@ iframe{
     <div class="card mal" onclick="openSub('mal')">MAL KABUL</div>
   </div>
 
+  <!-- STOK MENÜSÜ -->
   <div id="stok" class="menu hidden">
+    <div class="sub mam" onclick="openSheet(urls.mam,'Son ürün miktarlarını inceleyebilirsiniz.')">MAMÜLLER</div>
     <div class="sub hm" onclick="openSheet(urls.hm,'Hammadde Miktarlarını inceleyebilirsiniz.')">HAMMADDELER</div>
     <div class="sub opp" onclick="openSheet(urls.opp,'Bobin Miktarlarını inceleyebilirsiniz.')">BOBİNLER</div>
     <div class="sub omk" onclick="openSheet(urls.omk,'Koli Miktarlarını inceleyebilirsiniz.')">KOLİLER</div>
     <div class="sub pet" onclick="openSheet(urls.pet,'PET - CAM ve KAPAK Miktarlarını inceleyebilirsiniz.')">PET-CAM-KAPAK</div>
   </div>
 
+  <!-- MAL KABUL -->
   <div id="mal" class="menu hidden">
     <div class="sub mh1" onclick="openSheet(urls.mh1,'Mal Kabulü gerçekleşen hammaddeleri inceyebilirsiniz.')">GELEN HAMMADDE</div>
     <div class="sub mh2" onclick="openSheet(urls.mh2,'Mal kabulü gerçekleşen ambalaj , koli , kapak , şişe ve benzeri malzemeleri inceleyebilirsiniz.')">YARDIMCI MALZEME</div>
   </div>
 
+  <!-- SHEET -->
   <div id="sheet" class="hidden">
     <iframe id="frame"></iframe>
   </div>
@@ -174,6 +180,7 @@ iframe{
 
 <script>
 const urls={
+ mam:"https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=1484746316&single=true",
  hm:"https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=185627105&single=true",
  opp:"https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=326121089&single=true",
  omk:"https://docs.google.com/spreadsheets/d/e/2PACX-1vTNqOxfs7HAd05KsWVVL14sgKoLnR3vRnRFxeF-9geymh2lMOvjZH-agNftjODzzDhXd3vaT-7sDTQC/pubhtml?gid=2101965769&single=true",
